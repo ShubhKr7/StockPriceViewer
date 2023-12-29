@@ -1,0 +1,160 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Price Viewer</title>
+    <link rel="icon" href="icon.png">
+    <style>
+        body {
+            font-family: Actor;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url(bgimg.jpeg);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+
+        #container {
+            background-color: #000000;
+            border: #ccc 7px solid;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 110);
+            padding: 20px;
+            text-align: center;
+        }
+
+        #btn{
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 45%;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            font-weight: 400;
+            transition: 0.5s;
+            overflow: hidden;
+            text-decoration: none;
+            backdrop-filter: blur(15px);
+        }
+
+        #btn:hover {
+            letter-spacing: 1.1px;
+        }
+
+        #btn::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.5),
+            transparent);
+            transform: skewX(45deg) translateX(0);
+        }
+
+        #btn:hover::before{
+            transform: skewX(45deg) translateX(200%);
+        }
+
+        
+
+        h1 {
+            font-size: 24px;
+            color: #f4f4f4;
+        }
+
+        p {
+            font-size: 18px;
+            font-family: Alegreya;
+            color: #f4f4f4;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 90%;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #00ff95;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            width: 100%;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .photo{
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            max-height: 100vh;
+            border-radius: 50%;
+        }
+
+        #stock-price {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Stock Price Viewer</h1>
+        <p>Enter a company name to get its stock price:</p>
+        <input type="text" id="symbol" placeholder="Enter company name">
+        <button id = "btn">Get Stock Price</button>
+        <p id="stock-price"></p>
+    </div>
+    <img src="icon.png" alt="icon here" class = "photo">
+    <script>
+       
+        //ALPHA VANTAGE API KEY: 40BYD6UY9W3OJTM1 //NEW API KEY: 148W00TRU9K6W76J //AGAIN NEW API KEY: VNENCU2C48B4C6C4
+        document.addEventListener("DOMContentLoaded", function() {
+    const fetchButton = document.getElementById("btn");
+    const symbolInput = document.getElementById("symbol");
+    const stockPriceDiv = document.getElementById("stock-price");
+    
+    const apiKey = "40BYD6UY9W3OJTM1"; 
+
+    fetchButton.addEventListener("click", function() {
+        const symbol = symbolInput.value.toUpperCase();
+    
+        // Fetch stock price
+        fetchStockPrice(symbol);
+    });
+
+    function fetchStockPrice(symbol) {
+         const apiUrl = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=5min&apikey=${apiKey}`;
+                fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data["Time Series (5min)"]) {
+                    const latestTime = Object.keys(data["Time Series (5min)"])[0];
+                    const latestPrice = data["Time Series (5min)"][latestTime]["1. open"];
+                    stockPriceDiv.textContent = `Latest Price for ${symbol}: $${latestPrice}`;
+                } else {
+                    stockPriceDiv.textContent = "Data not available";
+                }
+            })
+            .catch(error => {
+                stockPriceDiv.textContent = "API request failed";
+                console.error(error);
+            });
+    }
+});
+
+    </script>
+</body>
+</html>
